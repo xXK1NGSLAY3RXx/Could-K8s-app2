@@ -10,3 +10,6 @@ steps:
       - 'CLOUDSDK_CONTAINER_CLUSTER=primary'
 images:
   - 'gcr.io/cloud-k8s-429121/container2'
+
+options:
+    logging: CLOUD_LOGGING_ONLY
