@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 const PORT = 7000;
-const FILE_DIR = path.join(__dirname, 'arta_PV_dir'); // Directory for file access
+const FILE_DIR = '/arta_PV_dir'; // Directory for file access
 
 const ERROR_MESSAGE = "Input file not in CSV format.";
 
@@ -19,6 +19,14 @@ app.post('/calculate', (req, res) => {
 
     console.log(`Calculating sum for file: ${filePath} and product: ${product}`);
 
+    const cleanRow = (row) => {
+        return Object.keys(row).reduce((cleaned, key) => {
+            const trimmedKey = key.trim();
+            cleaned[trimmedKey] = row[key].trim();
+            return cleaned;
+        }, {});
+    };
+
     const validateCSV = () => new Promise((resolve, reject) => {
         fs.createReadStream(filePath)
             .on('error', (err) => {
@@ -27,9 +35,11 @@ app.post('/calculate', (req, res) => {
             })
             .pipe(csvParser())
             .on('data', (row) => {
-                console.log('Row data:', row);
-                if (!row.product || !row.amount || isNaN(parseInt(row.amount, 10))) {
-                    console.error('Invalid CSV format:', row);
+                console.log('Row data before trimming:', row);
+                const cleanedRow = cleanRow(row);
+                console.log('Row data after trimming:', cleanedRow);
+                if (!cleanedRow.product || !cleanedRow.amount || isNaN(parseInt(cleanedRow.amount, 10))) {
+                    console.error('Invalid CSV format:', cleanedRow);
                     isCSV = false;
                 }
             })
@@ -46,8 +56,9 @@ app.post('/calculate', (req, res) => {
         fs.createReadStream(filePath)
             .pipe(csvParser())
             .on('data', (row) => {
-                if (row.product === product) {
-                    sum += parseInt(row.amount, 10);
+                const cleanedRow = cleanRow(row);
+                if (cleanedRow.product === product) {
+                    sum += parseInt(cleanedRow.amount, 10);
                     productFound = true;
                 }
             })
@@ -70,10 +81,11 @@ app.post('/calculate', (req, res) => {
             res.json({ "file": file, "sum": sum });
         })
         .catch((error) => {
+            console.error('Error calculating sum:', error);
             res.status(400).json(error);
         });
 });
 
 app.listen(PORT, () => {
-    console.log(`Container 2 listening on port ${PORT}`);
+    console.log(`Server listening on port ${PORT}`);
 });
