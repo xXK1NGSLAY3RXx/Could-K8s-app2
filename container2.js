@@ -9,7 +9,7 @@ const PORT = 7000;
 const FILE_DIR = '/arta_PV_dir'; // Directory for file access
 
 const ERROR_MESSAGE = "Input file not in CSV format.";
-
+//test
 app.post('/calculate', (req, res) => {
     const { file, product } = req.body;
     let sum = 0;
