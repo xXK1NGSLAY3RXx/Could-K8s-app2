@@ -19,7 +19,7 @@ spec:
           ports:
             - containerPort: 7000
           volumeMounts:
-            - mountPath: /mnt/data/arta_PV_dir
+            - mountPath: /arta_PV_dir
               name: storage
       volumes:
         - name: storage

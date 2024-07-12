@@ -6,7 +6,7 @@ const app = express();
 app.use(express.json());
 
 const PORT = 7000;
-const FILE_DIR = '/mnt/data/arta_PV_dir'; // Directory for file access
+const FILE_DIR = '/arta_PV_dir'; // Directory for file access
 
 const ERROR_MESSAGE = "Input file not in CSV format.";
 
