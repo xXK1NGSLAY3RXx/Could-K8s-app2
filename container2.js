@@ -64,6 +64,7 @@ app.post('/calculate', (req, res) => {
             });
     });
 
+
     validateCSV()
         .then(() => calculateSum())
         .then((sum) => {
