@@ -1,27 +1,35 @@
 const express = require('express');
 const fs = require('fs');
+const path = require('path');
 const csvParser = require('csv-parser');
 const app = express();
 app.use(express.json());
 
 const PORT = 7000;
+const FILE_DIR = '/mnt/data/arta_PV_dir'; // Directory for file access
 
 const ERROR_MESSAGE = "Input file not in CSV format.";
-
 
 app.post('/calculate', (req, res) => {
     const { file, product } = req.body;
     let sum = 0;
     let isCSV = true;
     let productFound = false;
-    const filePath = `/files/${file}`;
+    const filePath = path.join(FILE_DIR, file);
+
+    console.log(`Calculating sum for file: ${filePath} and product: ${product}`);
 
     const validateCSV = () => new Promise((resolve, reject) => {
         fs.createReadStream(filePath)
-            .on('error', () => reject({ "file": file, "error": ERROR_MESSAGE }))
+            .on('error', (err) => {
+                console.error('Error reading file:', err);
+                reject({ "file": file, "error": ERROR_MESSAGE });
+            })
             .pipe(csvParser())
             .on('data', (row) => {
+                console.log('Row data:', row);
                 if (!row.product || !row.amount || isNaN(parseInt(row.amount, 10))) {
+                    console.error('Invalid CSV format:', row);
                     isCSV = false;
                 }
             })
@@ -34,7 +42,6 @@ app.post('/calculate', (req, res) => {
             });
     });
 
-    
     const calculateSum = () => new Promise((resolve, reject) => {
         fs.createReadStream(filePath)
             .pipe(csvParser())
@@ -46,12 +53,15 @@ app.post('/calculate', (req, res) => {
             })
             .on('end', () => {
                 if (!productFound) {
-                    reject({ "file": file, "error": ERROR_MESSAGE });
+                    reject({ "file": file, "error": `Product ${product} not found.` });
                 } else {
                     resolve(sum);
                 }
             })
-            .on('error', () => reject({ "file": file, "error": ERROR_MESSAGE }));
+            .on('error', (err) => {
+                console.error('Error reading file:', err);
+                reject({ "file": file, "error": ERROR_MESSAGE });
+            });
     });
 
     validateCSV()
