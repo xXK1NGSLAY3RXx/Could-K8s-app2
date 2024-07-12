@@ -8,6 +8,7 @@ const PORT = 7000;
 
 const ERROR_MESSAGE = "Input file not in CSV format.";
 
+
 app.post('/calculate', (req, res) => {
     const { file, product } = req.body;
     let sum = 0;
