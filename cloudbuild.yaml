@@ -12,9 +12,12 @@ steps:
     entrypoint: 'gcloud'
     args: ['container', 'clusters', 'get-credentials', 'assignment-cluster', '--zone', 'us-central1-a', '--project', 'cloud-k8s-429121']
 
-  # Step to apply Kubernetes deployment manifest
+  # Step to apply Kubernetes deployment and service manifests
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/container2-deployment.yaml']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=assignment-cluster'
 
 images:
   - 'gcr.io/cloud-k8s-429121/container2'
