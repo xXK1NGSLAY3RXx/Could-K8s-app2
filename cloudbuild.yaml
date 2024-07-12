@@ -1,15 +1,27 @@
 steps:
+  # Step to build Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['build', '-t', 'gcr.io/cloud-k8s-429121/container2', '.']
+
+  # Step to push Docker image
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/cloud-k8s-429121/container2']
+
+  # Step to get cluster credentials
+  - name: 'gcr.io/cloud-builders/kubectl'
+    args: ['get', 'config', 'access-cluster', '--zone', 'us-central1-a', '--project', 'cloud-k8s-429121', '--cluster', 'assignment-cluster']
+    env:
+      - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=assignment-cluster'
+
+  # Step to apply Kubernetes manifests
   - name: 'gcr.io/cloud-builders/kubectl'
     args: ['apply', '-f', 'k8s/container2-deployment.yaml']
     env:
       - 'CLOUDSDK_COMPUTE_ZONE=us-central1-a'
-      - 'CLOUDSDK_CONTAINER_CLUSTER=primary'
+      - 'CLOUDSDK_CONTAINER_CLUSTER=assignment-cluster'
+
 images:
   - 'gcr.io/cloud-k8s-429121/container2'
-
 options:
-    logging: CLOUD_LOGGING_ONLY
+  logging: CLOUD_LOGGING_ONLY
