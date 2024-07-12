@@ -19,12 +19,12 @@ spec:
           ports:
             - containerPort: 7000
           volumeMounts:
-            - mountPath: /mnt/data/Arta_PV_dir
+            - mountPath: /mnt/data/arta_PV_dir
               name: storage
       volumes:
         - name: storage
           persistentVolumeClaim:
-            claimName: Arta-pvc
+            claimName: arta-pvc
 ---
 # Service
 apiVersion: v1
